@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using Facebook.WitAi.TTS.Integrations;
-using Facebook.WitAi.Windows;
 using UnityEngine;
 
 namespace Facebook.WitAi.TTS.Editor.Voices
@@ -29,7 +28,32 @@ namespace Facebook.WitAi.TTS.Editor.Voices
         private const string VAR_STYLE = "style";
 
         // Subfields
-        private static FieldInfo[] _fields = FieldGUI.GetFields(typeof( TTSWitVoiceSettings));
+        private static List<FieldInfo> _fields = null;
+
+        // Get subfields
+        public void UpdateFields()
+        {
+            // Ignore
+            if (_fields != null)
+            {
+                return;
+            }
+
+            // Get type
+            Type type = fieldInfo.FieldType;
+            if (type.IsArray)
+            {
+                type = type.GetElementType();
+            }
+
+            // Get fields
+            _fields = new List<FieldInfo>();
+            FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+            if (fields != null)
+            {
+                _fields.AddRange(fields);
+            }
+        }
 
         // Determine height
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -40,7 +64,8 @@ namespace Facebook.WitAi.TTS.Editor.Voices
                 return VAR_HEIGHT;
             }
             // Add each
-            int total = _fields.Length + 1;
+            UpdateFields();
+            int total = _fields.Count + 1;
             int voiceIndex = GetVoiceIndex(property);
             if (voiceIndex != -1)
             {
@@ -70,7 +95,8 @@ namespace Facebook.WitAi.TTS.Editor.Voices
             int voiceIndex = GetVoiceIndex(property);
 
             // Iterate subfields
-            for (int s = 0; s < _fields.Length; s++)
+            UpdateFields();
+            for (int s = 0; s < _fields.Count; s++)
             {
                 FieldInfo subfield = _fields[s];
                 SerializedProperty subfieldProperty = property.FindPropertyRelative(subfield.Name);

@@ -7,7 +7,9 @@
  */
 
 using UnityEditor;
+using UnityEngine;
 using System.Reflection;
+using Facebook.WitAi.Data.Entities;
 
 namespace Facebook.WitAi.Windows
 {

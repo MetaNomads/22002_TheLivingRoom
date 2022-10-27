@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -21,14 +20,15 @@ internal class OVRMeshGenerator
 	/// Returns a mesh generated from a array of vertices.
 	/// </summary>
 	/// <param name="vertices">Source boundary vertices</param>
-	/// <param name="mesh">The output mesh</param>
+	/// <param name="requireTransform">If true, source vertices position will
+	/// be transformed from OpenXR to Unity coordinate space.</param>
 	/// <returns>Generate Unity mesh object.</returns>
-	public static void GenerateMesh(NativeArray<Vector2> vertices, Mesh mesh)
+	public static void GenerateMesh(Vector2[] vertices, Mesh mesh)
 	{
 		TransformVertices(vertices,
 			out var verticesV3,
 			out var uvCoords,
-			out var normals);
+			out var normals);		
 
 		var triangles = GenerateTrianglesFromBoundaryVertices(vertices);
 
@@ -48,20 +48,23 @@ internal class OVRMeshGenerator
 	/// <param name="verticesV3">Transformed vertices</param>
 	/// <param name="uvCoords">UV coords</param>
 	/// <param name="normals">Vertices normals</param>
-	public static void TransformVertices(NativeArray<Vector2> vertices, out Vector3[] verticesV3, out Vector2[] uvCoords,
+	/// <param name="requireTransform">If true, transform vertices position from OpenXR to Unity space.</param>
+	public static void TransformVertices(Vector2[] vertices, out Vector3[] verticesV3, out Vector2[] uvCoords,
 		out Vector3[] normals)
 	{
 		uvCoords = new Vector2[vertices.Length];
 		verticesV3 = new Vector3[vertices.Length];
 		normals = new Vector3[vertices.Length];
-
+		
 		for (int i = 0; i < vertices.Length; i++)
 		{
 			verticesV3[i] = vertices[i];
 			verticesV3[i].x *= -1;
-
+			
 			uvCoords[i] = verticesV3[i];
-			normals[i] = new Vector3(0,0,1);
+			
+			normals[i] = verticesV3[i];
+			normals[i].z = 1;
 		}
 	}
 
@@ -76,21 +79,22 @@ internal class OVRMeshGenerator
 	/// <exception cref="ArgumentException">
 	/// Throws when invalid number of vertices are passed. Minimum required vertices are 3.
 	/// </exception>
-	public static int[] GenerateTrianglesFromBoundaryVertices(NativeArray<Vector2> vertices)
+	public static int[] GenerateTrianglesFromBoundaryVertices(Vector2[] vertices)
 	{
-		if (!vertices.IsCreated)
+
+		if (vertices == null)
 		{
-			throw new ArgumentException("Invalid vertex array.", nameof(vertices));
+			throw new ArgumentNullException();
 		}
 
 		if (vertices.Length < 3)
 		{
-			throw new ArgumentException("Vertices count cannot be less than 3.", nameof(vertices));
+			throw new ArgumentException("Vertices count cannot be less than 3.");
 		}
 
 		int totalTriangleCount = (vertices.Length - 2);
 		int[] triangles = new int[totalTriangleCount * 3];
-
+		
 		List<int> indexList = new List<int>();
 		for (int i = 0; i < vertices.Length; i++)
 		{
@@ -180,7 +184,7 @@ internal class OVRMeshGenerator
 	/// <returns>Clockwise or Counter-Clockwise vertices order.</returns>
 	public static WindingOrderMode GetWindingOrder(Vector2[] vertices)
 	{
-
+		
 		float total = 0;
 		for(int i = 1; i < vertices.Length; i++)
 		{

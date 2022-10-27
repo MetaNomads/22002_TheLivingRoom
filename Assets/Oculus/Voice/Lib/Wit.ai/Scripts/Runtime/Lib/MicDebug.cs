@@ -8,6 +8,8 @@
 
 using System;
 using System.IO;
+using System.Collections;
+using Facebook.WitAi.Data;
 using Facebook.WitAi.Interfaces;
 using Facebook.WitAi.Utilities;
 using UnityEngine;
@@ -34,6 +36,7 @@ namespace Facebook.WitAi.Lib
             }
             if (_micSource != null)
             {
+                Debug.Log("MicDebug - Add Mic Delegates");
                 _micSource.OnStartRecording += OnStartRecording;
                 _micSource.OnSampleReady += OnSampleReady;
                 _micSource.OnStopRecording += OnStopRecording;
@@ -44,6 +47,7 @@ namespace Facebook.WitAi.Lib
         {
             if (_micSource != null)
             {
+                Debug.Log("MicDebug - Remove Mic Delegates");
                 _micSource.OnStartRecording -= OnStartRecording;
                 _micSource.OnSampleReady -= OnSampleReady;
                 _micSource.OnStopRecording -= OnStopRecording;

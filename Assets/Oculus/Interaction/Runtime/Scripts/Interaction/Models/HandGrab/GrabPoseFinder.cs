@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-using Oculus.Interaction.Grab;
 using Oculus.Interaction.Input;
 using System.Collections.Generic;
 using UnityEngine;
@@ -92,7 +91,7 @@ namespace Oculus.Interaction.HandGrab
             {
                 result.HasHandPose = false;
                 result.SnapPose = new Pose(_cachedFallbackPose.position, Quaternion.Inverse(_relativeTo.rotation) * userPose.rotation);
-                result.Score = GrabPoseHelper.Similarity(userPose, _fallbackTransform.GetPose(), scoringModifier);
+                result.Score = PoseUtils.Similarity(userPose, _fallbackTransform.GetPose(), scoringModifier);
                 return true;
             }
         }

@@ -1,4 +1,3 @@
-using Unity.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -26,16 +25,13 @@ public class OVRScenePlaneMeshFilter : MonoBehaviour
 	private void CreateMeshFromBoundary()
 	{
 		var sceneAnchor = GetComponent<OVRSceneAnchor>();
-		if (sceneAnchor == null) return;
-
-		_mesh.name = $"OVRPlaneMeshFilter {sceneAnchor.Uuid}";
-
-		var boundary = OVRPlugin.GetSpaceBoundary2D(sceneAnchor.Space, Allocator.Temp);
-		if (!boundary.IsCreated) return;
-
-		using (boundary)
+		if (sceneAnchor == null ||
+			!OVRPlugin.GetSpaceBoundary2D(sceneAnchor.Space, out var boundaryVertices))
 		{
-			OVRMeshGenerator.GenerateMesh(boundary, _mesh);
+			return;
 		}
+
+		_mesh.name = $"OVRPlaneMeshFilter {sceneAnchor.Space}";
+		OVRMeshGenerator.GenerateMesh(boundaryVertices, _mesh);
 	}
 }

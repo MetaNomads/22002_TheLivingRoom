@@ -18,12 +18,13 @@
  * limitations under the License.
  */
 
-using Oculus.Voice.Core.Bindings.Interfaces;
-using Oculus.Voice.Core.Utilities;
+using Facebook.WitAi.Utilities;
+using Oculus.Voice.Core.Bindings.Android;
+using Oculus.Voice.Interfaces;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Oculus.Voice.Core.Bindings.Android.PlatformLogger
+namespace Oculus.Voice.Bindings.Android
 {
     public class VoiceSDKPlatformLoggerImpl : BaseAndroidConnectionImpl<VoiceSDKLoggerBinding>, IVoiceSDKLogger
     {
@@ -40,9 +41,9 @@ namespace Oculus.Voice.Core.Bindings.Android.PlatformLogger
         {
         }
 
-        public override void Connect(string version)
+        public override void Connect()
         {
-            base.Connect(version);
+            base.Connect();
             service.Connect();
             Debug.Log(
                 $"Logging Platform integration initialization complete.");

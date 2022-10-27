@@ -46,7 +46,7 @@ namespace Oculus.Voice.Core.Bindings.Android
             serviceGetter = serviceGetterMethodName;
         }
 
-        public void Connect(string version)
+        public void Connect()
         {
             if (null == mAssistantServiceConnection)
             {
@@ -58,7 +58,7 @@ namespace Oculus.Voice.Core.Bindings.Android
                 using (AndroidJavaClass assistantBackgroundFragment = new AndroidJavaClass(serviceFragmentClass))
                 {
                     mAssistantServiceConnection =
-                        assistantBackgroundFragment.CallStatic<AndroidJavaObject>("createAndAttach", activity, version);
+                        assistantBackgroundFragment.CallStatic<AndroidJavaObject>("createAndAttach", activity);
                 }
             }
         }

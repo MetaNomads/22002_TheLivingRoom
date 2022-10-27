@@ -44,7 +44,6 @@ namespace Oculus.Voice.Demo
         // Add delegates
         private void OnEnable()
         {
-            textArea.text = freshStateText;
             appVoiceExperience.events.OnRequestCreated.AddListener(OnRequestStarted);
             appVoiceExperience.events.OnPartialTranscription.AddListener(OnRequestTranscript);
             appVoiceExperience.events.OnFullTranscription.AddListener(OnRequestTranscript);

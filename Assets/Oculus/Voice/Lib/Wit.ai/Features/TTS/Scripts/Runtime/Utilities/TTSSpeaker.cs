@@ -11,7 +11,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using Facebook.WitAi.TTS.Data;
-using UnityEngine.Serialization;
 
 namespace Facebook.WitAi.TTS.Utilities
 {
@@ -46,8 +45,8 @@ namespace Facebook.WitAi.TTS.Utilities
         [HideInInspector] [SerializeField] public string presetVoiceID;
         public TTSVoiceSettings VoiceSettings => TTSService.Instance.GetPresetVoiceSettings(presetVoiceID);
         // Audio source
-        [SerializeField] [FormerlySerializedAs("_source")]
-        public AudioSource AudioSource;
+        [SerializeField] private AudioSource _source;
+        public AudioSource AudioSource => _source;
         // Events
         [SerializeField] private TTSSpeakerEvents _events;
         public TTSSpeakerEvents Events => _events;
@@ -55,15 +54,15 @@ namespace Facebook.WitAi.TTS.Utilities
         // Automatically generate source if needed
         protected virtual void Awake()
         {
-            if (AudioSource == null)
+            if (_source == null)
             {
-                AudioSource = gameObject.GetComponentInChildren<AudioSource>();
-                if (AudioSource == null)
+                _source = gameObject.GetComponentInChildren<AudioSource>();
+                if (_source == null)
                 {
-                    AudioSource = gameObject.AddComponent<AudioSource>();
+                    _source = gameObject.AddComponent<AudioSource>();
                 }
             }
-            AudioSource.playOnAwake = false;
+            _source.playOnAwake = false;
             TTSService.Instance.Events.OnClipUnloaded.AddListener(OnClipUnload);
         }
         // Stop speaking
@@ -192,7 +191,7 @@ namespace Facebook.WitAi.TTS.Utilities
                 // Stop source
                 if (_lastClip != null)
                 {
-                    AudioSource.Stop();
+                    _source.Stop();
                 }
 
                 // Cancel calls
@@ -287,7 +286,7 @@ namespace Facebook.WitAi.TTS.Utilities
             Events?.OnStartSpeaking?.Invoke(this, _lastClip.textToSpeak);
 
             // Play clip & wait
-            AudioSource.PlayOneShot(_lastClip.clip);
+            _source.PlayOneShot(_lastClip.clip);
             _player = StartCoroutine(OnPlaybackWait());
         }
         // Wait for clip completion

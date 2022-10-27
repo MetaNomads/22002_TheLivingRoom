@@ -9,7 +9,6 @@
 using System;
 using Facebook.WitAi.Data.Configuration;
 using Facebook.WitAi.Interfaces;
-using Facebook.WitAi.Utilities;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -40,11 +39,9 @@ namespace Facebook.WitAi.Configuration
         public float minTranscriptionKeepAliveTimeInSeconds = 1f;
 
         [Tooltip("The maximum amount of time in seconds the mic will stay active")]
-        [DynamicRange("RecordingTimeRange")]
+        [Range(0, 20f)]
         [SerializeField]
         public float maxRecordingTime = 20;
-
-        protected virtual Vector2 RecordingTimeRange => new Vector2(0, 20);
 
         [Header("Sound Activation")]
         [Tooltip("The minimum volume level needed to be heard to start collecting data from the audio source.")]

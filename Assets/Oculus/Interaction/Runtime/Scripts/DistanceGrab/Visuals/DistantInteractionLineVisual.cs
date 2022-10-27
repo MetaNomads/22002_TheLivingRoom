@@ -80,7 +80,6 @@ namespace Oculus.Interaction.DistanceReticles
             if (_started)
             {
                 DistanceInteractor.WhenStateChanged += HandleStateChanged;
-                DistanceInteractor.WhenPostprocessed += HandlePostProcessed;
             }
         }
 
@@ -89,7 +88,14 @@ namespace Oculus.Interaction.DistanceReticles
             if (_started)
             {
                 DistanceInteractor.WhenStateChanged -= HandleStateChanged;
-                DistanceInteractor.WhenPostprocessed -= HandlePostProcessed;
+            }
+        }
+
+        protected virtual void Update()
+        {
+            if (_shouldDrawLine)
+            {
+                UpdateLine();
             }
         }
 
@@ -107,7 +113,7 @@ namespace Oculus.Interaction.DistanceReticles
                 case InteractorState.Hover:
                     if (args.PreviousState == InteractorState.Normal)
                     {
-                        InteractableSet(DistanceInteractor.DistanceInteractable);
+                        InteractableSet(DistanceInteractor.Candidate as MonoBehaviour);
                     }
                     break;
             }
@@ -127,27 +133,19 @@ namespace Oculus.Interaction.DistanceReticles
                 _shouldDrawLine = _visibleDuringNormal;
             }
         }
-
-        private void HandlePostProcessed()
+        protected virtual void InteractableSet(MonoBehaviour interactable)
         {
-            if (_shouldDrawLine)
+            if (interactable == null)
             {
-                UpdateLine();
-            }
-        }
-
-        protected virtual void InteractableSet(IDistanceInteractable interactable)
-        {
-            Component component = interactable as Component;
-            if (component == null)
-            {
-                _target = null;
                 return;
             }
-
-            if (!component.TryGetComponent(out _target))
+            if (interactable.TryGetComponent(out IReticleData reticleData))
             {
-                _dummyTarget.Target = interactable.RelativeTo;
+                _target = reticleData;
+            }
+            else if (interactable is IDistanceInteractable)
+            {
+                _dummyTarget.Target = (interactable as IDistanceInteractable).RelativeTo;
                 _target = _dummyTarget;
             }
         }
@@ -159,11 +157,10 @@ namespace Oculus.Interaction.DistanceReticles
 
         private void UpdateLine()
         {
-            Vector3 direction = DistanceInteractor.Origin.forward;
-            Vector3 origin = DistanceInteractor.Origin.position;
-            Vector3 start = origin + direction * VisualOffset;
-            Vector3 end = TargetHit(DistanceInteractor.HitPoint);
-            Vector3 middle = start + direction * Vector3.Distance(start, end) * 0.5f;
+            ConicalFrustum frustum = DistanceInteractor.PointerFrustum;
+            Vector3 start = frustum.StartPoint + frustum.Direction * VisualOffset;
+            Vector3 end = TargetHit(frustum);
+            Vector3 middle = start + frustum.Direction * Vector3.Distance(start, end) * 0.5f;
 
             for (int i = 0; i < NumLinePoints; i++)
             {
@@ -177,15 +174,14 @@ namespace Oculus.Interaction.DistanceReticles
 
         protected abstract void RenderLine(List<Vector3> linePoints);
 
-        protected Vector3 TargetHit(Vector3 hitPoint)
+        protected Vector3 TargetHit(ConicalFrustum frustum)
         {
             if (_target != null)
             {
-                return _target.ProcessHitPoint(hitPoint);
+                return _target.GetTargetHit(frustum);
             }
 
-            return DistanceInteractor.Origin.position
-                + DistanceInteractor.Origin.forward * _targetlessLength;
+            return frustum.StartPoint + frustum.Direction * _targetlessLength;
         }
 
         protected static Vector3 EvaluateBezier(Vector3 start, Vector3 middle, Vector3 end, float t)
@@ -201,7 +197,7 @@ namespace Oculus.Interaction.DistanceReticles
         {
             public Transform Target { get; set; }
 
-            public Vector3 ProcessHitPoint(Vector3 hitPoint)
+            public Vector3 GetTargetHit(ConicalFrustum frustum)
             {
                 return Target.position;
             }
@@ -209,7 +205,7 @@ namespace Oculus.Interaction.DistanceReticles
 
         #region Inject
 
-        public void InjectAllDistantInteractionLineVisual(IDistanceInteractor interactor)
+        public void InjectAllDistantInteractionLineVisual(IDistanceInteractor interactor, Material material)
         {
             InjectDistanceInteractor(interactor);
         }

@@ -6,6 +6,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+using UnityEngine;
+
+
 namespace Facebook.WitAi.Data.Configuration
 {
     public class WitApplicationDetailProvider : IApplicationDetailProvider

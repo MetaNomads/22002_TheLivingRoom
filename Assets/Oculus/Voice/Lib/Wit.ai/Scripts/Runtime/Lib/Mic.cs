@@ -19,8 +19,7 @@
 // THE SOFTWARE.
 // Source: https://github.com/adrenak/unimic/blob/master/Assets/UniMic/Runtime/Mic.cs
 
-#if UNITY_EDITOR && UNITY_ANDROID
-// Simulates Android Permission Popup
+#if UNITY_EDITOR
 #define EDITOR_PERMISSION_POPUP
 #endif
 
@@ -174,25 +173,6 @@ namespace Facebook.WitAi.Lib
             }
         }
 
-        /// <summary>
-        /// Enable to show mic log
-        /// </summary>
-        [SerializeField] private bool _showLog = false;
-
-        // Log comments or errors
-        public void Log(string comment, bool warning = false)
-        {
-            string final = $"[Mic] {comment}";
-            if (warning)
-            {
-                Debug.LogWarning(final);
-            }
-            else if (_showLog)
-            {
-                Debug.Log(final);
-            }
-        }
-
         private void OnEnable()
         {
             SafeStartMicrophone();
@@ -264,25 +244,14 @@ namespace Facebook.WitAi.Lib
             _devices = new List<string>();
             UnityEngine.Profiling.Profiler.BeginSample("Microphone Devices");
             string[] micIDs = Microphone.devices;
+            Debug.Log("Checking for Mic Devices");
             if (micIDs != null)
             {
-                _devices.AddRange(micIDs);
-            }
-#if EDITOR_PERMISSION_POPUP
-            if (Time.frameCount < 5)
-            {
-                _devices.Clear();
-            }
-            else
-#endif
-            {
-                if (_devices.Count == 0)
+                #if EDITOR_PERMISSION_POPUP
+                if (Time.frameCount > 5)
+                #endif
                 {
-                    Log("No mics found", true);
-                }
-                else
-                {
-                    Log($"Found {_devices.Count} Mics");
+                    _devices.AddRange(micIDs);
                 }
             }
             UnityEngine.Profiling.Profiler.EndSample();
@@ -302,7 +271,7 @@ namespace Facebook.WitAi.Lib
 
         private void StartMicrophone()
         {
-            Log("Reserved mic " + CurrentDeviceName);
+            Debug.Log("[Mic] Reserved mic " + CurrentDeviceName);
             AudioClip = Microphone.Start(CurrentDeviceName, true, 1, AudioEncoding.samplerate);
             AudioClip.name = CurrentDeviceName;
         }
@@ -311,7 +280,7 @@ namespace Facebook.WitAi.Lib
         {
             if (Microphone.IsRecording(CurrentDeviceName))
             {
-                Log("Released mic " + CurrentDeviceName);
+                Debug.Log("[Mic] Released mic " + CurrentDeviceName);
                 Microphone.End(CurrentDeviceName);
             }
             if (AudioClip != null)
@@ -358,7 +327,7 @@ namespace Facebook.WitAi.Lib
                 // Make sure we seek before we start reading data
                 Microphone.GetPosition(CurrentDeviceName);
 
-                Log("Started recording with " + CurrentDeviceName);
+                Debug.Log("[Mic] Started recording with " + CurrentDeviceName);
                 if (OnStartRecording != null)
                     OnStartRecording.Invoke();
             }
@@ -379,7 +348,7 @@ namespace Facebook.WitAi.Lib
 
             StopCoroutine(ReadRawAudio());
 
-            Log("Stopped recording with " + CurrentDeviceName);
+            Debug.Log("[Mic] Stopped recording with " + CurrentDeviceName);
             if (OnStopRecording != null)
                 OnStopRecording.Invoke();
         }

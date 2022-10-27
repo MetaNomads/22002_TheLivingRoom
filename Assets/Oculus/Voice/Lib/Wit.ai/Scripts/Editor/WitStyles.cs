@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -95,7 +97,6 @@ namespace Facebook.WitAi
             Label.active.textColor = Color.white;
             Label.richText = true;
             Label.wordWrap = false;
-            Label.clipping = TextClipping.Clip;
             LabelWrap = new GUIStyle(Label);
             LabelWrap.wordWrap = true;
             LabelSubheader = new GUIStyle(Label);

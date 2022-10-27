@@ -119,8 +119,7 @@ namespace Meta.Conduit
                     Type = targetType,
                     MethodInfo = targetMethod,
                     MinConfidence = actionAttribute.MinConfidence,
-                    MaxConfidence = actionAttribute.MaxConfidence,
-                    ValidatePartial = actionAttribute.ValidatePartial
+                    MaxConfidence = actionAttribute.MaxConfidence
                 };
 
                 if (!this.methodLookup.ContainsKey(action.Name))

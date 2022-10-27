@@ -338,6 +338,7 @@ namespace Facebook.WitAi.Windows
                 _responseText = _status;
                 _submitStart = System.DateTime.Now;
                 _request = witConfiguration.MessageRequest(_utterance, new WitRequestOptions());
+                _request.onPartialResponse += (r) => OnPartialResponse(r?.ResponseData);
                 _request.onResponse += (r) => OnResponse(r?.ResponseData);
                 _request.Request();
             }
@@ -352,6 +353,13 @@ namespace Facebook.WitAi.Windows
             }
         }
 
+        private void OnPartialResponse(WitResponseNode ResponseData)
+        {
+            if (null != ResponseData)
+            {
+                ShowResponse(ResponseData, true);
+            }
+        }
         private void OnResponse(WitResponseNode ResponseData)
         {
             _responseCode = _request.StatusCode;
@@ -421,7 +429,7 @@ namespace Facebook.WitAi.Windows
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(15 * EditorGUI.indentLevel);
-                if (GUILayout.Button($"{child} = {childNode.Value}", WitStyles.LabelWrap))
+                if (GUILayout.Button($"{child} = {childNode.Value}", "Label"))
                 {
                     ShowNodeMenu(childNode, childPath);
                 }

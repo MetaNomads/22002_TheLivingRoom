@@ -54,8 +54,8 @@ namespace Oculus.Interaction
                 broadcaster = triggerGameObject.AddComponent<InteractableTriggerBroadcaster>();
                 broadcaster.InjectAllInteractableTriggerBroadcaster(interactable);
                 _broadcasters.Add(interactable, broadcaster);
-                broadcaster.WhenTriggerEntered += HandleTriggerEntered;
-                broadcaster.WhenTriggerExited += HandleTriggerExited;
+                broadcaster.OnTriggerEntered += MarkCollision;
+                broadcaster.OnTriggerExited += UnmarkCollision;
             }
         }
 
@@ -66,19 +66,15 @@ namespace Oculus.Interaction
             InteractableTriggerBroadcaster broadcaster;
             if (_broadcasters.TryGetValue(interactable, out broadcaster))
             {
+                broadcaster.enabled = false;
+                broadcaster.OnTriggerEntered -= MarkCollision;
+                broadcaster.OnTriggerExited -= UnmarkCollision;
                 _broadcasters.Remove(interactable);
-
-                if (broadcaster != null)
-                {
-                    broadcaster.enabled = false;
-                    broadcaster.WhenTriggerEntered -= HandleTriggerEntered;
-                    broadcaster.WhenTriggerExited -= HandleTriggerExited;
-                    Object.Destroy(broadcaster);
-                }
+                Object.Destroy(broadcaster);
             }
         }
 
-        private void HandleTriggerEntered(IInteractable interactable, Rigidbody rigidbody)
+        private void MarkCollision(IInteractable interactable, Rigidbody rigidbody)
         {
             TInteractable typedInteractable = interactable as TInteractable;
             if (!_rigidbodyCollisionMap.ContainsKey(rigidbody))
@@ -90,7 +86,7 @@ namespace Oculus.Interaction
             interactables.Add(typedInteractable);
         }
 
-        private void HandleTriggerExited(IInteractable interactable, Rigidbody rigidbody)
+        private void UnmarkCollision(IInteractable interactable, Rigidbody rigidbody)
         {
             TInteractable typedInteractable = interactable as TInteractable;
             HashSet<TInteractable> interactables = _rigidbodyCollisionMap[rigidbody];
@@ -112,6 +108,6 @@ namespace Oculus.Interaction
             return _empty;
         }
 
-        private static readonly List<TInteractable> _empty = new List<TInteractable>();
+        private  static readonly List<TInteractable> _empty = new List<TInteractable>();
     }
 }

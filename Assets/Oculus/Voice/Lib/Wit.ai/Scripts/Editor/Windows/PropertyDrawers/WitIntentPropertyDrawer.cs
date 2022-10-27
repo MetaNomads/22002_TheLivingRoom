@@ -8,6 +8,7 @@
 
 using UnityEditor;
 using UnityEngine;
+using Facebook.WitAi.Data.Intents;
 using System.Reflection;
 
 namespace Facebook.WitAi.Windows

@@ -8,7 +8,7 @@
 
 using System;
 
-namespace Oculus.Voice.Core.Utilities
+namespace Facebook.WitAi.Utilities
 {
     public class DateTimeUtility
     {

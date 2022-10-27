@@ -55,7 +55,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Facebook.WitAi.Data.Entities;
 using Facebook.WitAi.Data.Intents;
-using UnityEngine;
 
 
 namespace Facebook.WitAi.Lib
@@ -222,54 +221,6 @@ namespace Facebook.WitAi.Lib
         public virtual WitResponseClass AsObject
         {
             get { return this as WitResponseClass; }
-        }
-
-        public virtual T Cast<T>(T defaultValue = default(T))
-        {
-            // Default value
-            object result = defaultValue;
-
-            // Cast each node
-            string typeName = typeof(T).ToString();
-            if (string.Equals(typeName, typeof(string).ToString()))
-            {
-                result = this.Value;
-            }
-            else if (string.Equals(typeName, typeof(int).ToString()))
-            {
-                result = this.AsInt;
-            }
-            else if (string.Equals(typeName, typeof(float).ToString()))
-            {
-                result = this.AsFloat;
-            }
-            else if (string.Equals(typeName, typeof(double).ToString()))
-            {
-                result = this.AsDouble;
-            }
-            else if (string.Equals(typeName, typeof(bool).ToString()))
-            {
-                result = this.AsBool;
-            }
-            else if (string.Equals(typeName, typeof(string[]).ToString()))
-            {
-                result = this.AsStringArray;
-            }
-            else if (string.Equals(typeName, typeof(WitResponseArray).ToString()))
-            {
-                result = this.AsArray;
-            }
-            else if (string.Equals(typeName, typeof(WitResponseClass).ToString()))
-            {
-                result = this.AsObject;
-            }
-            else
-            {
-                Debug.LogWarning($"WitResponseNode - Cast to {typeName} not supported");
-            }
-
-            // Return result
-            return (T)result;
         }
 
         public virtual WitEntityData AsWitEntity => new WitEntityData(this);
@@ -906,6 +857,7 @@ namespace Facebook.WitAi.Lib
             get { return m_Dict.Count; }
         }
 
+
         public override void Add(string aKey, WitResponseNode aItem)
         {
             if (!string.IsNullOrEmpty(aKey))
@@ -964,19 +916,6 @@ namespace Facebook.WitAi.Lib
         {
             foreach (KeyValuePair<string, WitResponseNode> N in m_Dict)
                 yield return N;
-        }
-
-        public T GetChild<T>(string aKey, T defaultValue = default(T))
-        {
-            // Return default immediately
-            if (!HasChild(aKey))
-            {
-                return defaultValue;
-            }
-
-            // Get response node
-            WitResponseNode node = this[aKey];
-            return node.Cast<T>(defaultValue);
         }
 
         public override string ToString()
