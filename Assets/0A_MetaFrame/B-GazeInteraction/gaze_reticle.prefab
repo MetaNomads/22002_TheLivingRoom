@@ -301,5 +301,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _canvas: {fileID: 5284516316043185477}
   _imageProgress: {fileID: 295726800}
-  _scale: 1
+  _scale: 0.65
   _offsetFromHit: 0.1

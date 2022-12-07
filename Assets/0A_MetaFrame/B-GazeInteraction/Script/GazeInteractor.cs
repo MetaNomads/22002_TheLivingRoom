@@ -83,7 +83,7 @@ namespace Autohand.GazeInteraction
                 }
 
                 _interactable.GazeStay(this, _hit.point);
-                GazePoint = _hit.point;
+                GazePoint = _hit.transform.position;
 
                 if (_interactable.IsActivable && !_interactable.IsActivated)
                 {

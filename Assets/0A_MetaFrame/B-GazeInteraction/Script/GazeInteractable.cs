@@ -26,7 +26,7 @@ namespace Autohand.GazeInteraction
         public event OnActivated Activated;
 
 
-        [SerializeField] private bool _isActivable;
+        [SerializeField] private bool _isActivable = true;
         [SerializeField] private float _exitDelay;
 
         [SerializeField] private GameObject InteractableObject;

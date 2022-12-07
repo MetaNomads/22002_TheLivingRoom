@@ -25,16 +25,11 @@ namespace Autohand.GazeInteraction
 
         private void Start()
         {
-            _canvas.transform.localScale = Vector3.one * _scale;
+            _canvas.transform.localScale = Vector3.one * _scale;          
         }
         private void Update()
         {
-            if(_interactor == null) { return; }
 
-            var distance = Vector3.Distance(_interactor.transform.position, transform.position);
-            var scale = distance * _scale;
-            scale = Mathf.Clamp(scale, _scale, scale);
-            _canvas.transform.localScale = Vector3.one * scale;
         }
 
         public void SetInteractor(GazeInteractor interactor)
@@ -49,10 +44,15 @@ namespace Autohand.GazeInteraction
 
         public void SetTarget(RaycastHit hit)
         {
+            var distance = Vector3.Distance(_interactor.transform.position, hit.point);
+            var scale = distance * _scale;
+            scale = Mathf.Clamp(scale, _scale, scale);
+
             var direction = _interactor.transform.position - hit.point;
             var rotation = Quaternion.FromToRotation(Vector3.forward, direction);
-            var position = hit.point + transform.forward * _offsetFromHit;
+            var position = hit.point + direction * _offsetFromHit;       
 
+            _canvas.transform.localScale = Vector3.one * scale;
             transform.SetPositionAndRotation(position, rotation);
         }
         public void SetProgress(float progress)
